@@ -1,0 +1,16 @@
+services:
+  - type: worker
+    name: ezostylia-discord-bot
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python bot.py
+    envVars:
+      - key: DISCORD_TOKEN
+        sync: false
+      - key: LLM_API_KEY
+        sync: false
+      - key: LLM_BASE_URL
+        value: https://integrations.emergentagent.com/llm/v1
+      - key: LLM_MODEL
+        value: gpt-4o-mini
