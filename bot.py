@@ -412,8 +412,8 @@ MEDITATION_THEMES: dict[str, list[str]] = {
         "Wyobraź sobie, że stoisz w starożytnej świątyni otoczonej świecami. Oddychaj głęboko i poczuj jak energia Wszechświata przepływa przez Twoje ciało. Pozwól myślom odpłynąć jak liściom na jesiennym wietrze.",
         "Zamknij oczy i wyobraź sobie noc pełną gwiazd. Każda gwiazda reprezentuje jedną z Twoich wewnętrznych prawd. Wybierz jedną i pozwól jej światłu ogrzać Twoje serce.",
         "Usiądź wygodnie i zwróć uwagę na swój oddech. Wyobraź sobie strumień krystalicznie czystej wody, który obmywa Twoją duszę z napięć dnia. Z każdym oddechem czujesz się lżejszy.",
-        "Poczuj pod stopami ciepłą ziemię pradawnego lasu. Drzewa szepoczą starożytne mądrości do Twojego serca. Jesteś częścią wielkiego kosmicznego cyklu natury.",
-        "Wyobraź sobie, że siedzisz na szczycie góry o wschodzie słońca. Ciepłe promienie budzą w Tobie ukrytą moc. Jesteś gotowy na nowy dzień pełen duchowego wzrostu.",
+        "Poczuj pod stopami ciepłą ziemię pradawnego lasu. Drzewa szepczeszą starożytne mądrości do Twojego serca. Jesteś częścią wielkiego kosmicznego cyklu natury.",
+        "Wyobraź sobie, że siedzisz na szczycie góry o wschodzie słońca. Ciepłe promienie budzą w Tobie ukrytą moc. Jesteś gotów na nowy dzień pełen duchowego wzrostu.",
         "Skup się na pulsowaniu swojego serca — każde uderzenie to kosmiczny rytm łączący Cię z Wszechświatem. Pozwól temu rytmowi prowadzić Twoje myśli ku wewnętrznemu spokojowi.",
         "Zamknij oczy i wyobraź sobie purpurowe światło otaczające Twoje ciało. To światło ochronne oczyszcza Twoją aurę. Oddychaj nim głęboko i poczuj wewnętrzną harmonię.",
     ],
@@ -598,7 +598,25 @@ async def cmd_help(interaction: discord.Interaction):
 
 
 # ---------------------------------------------------------------------------
+# Health-check HTTP server (required by Render.com free web service)
+# ---------------------------------------------------------------------------
+import threading
+from http.server import HTTPServer, BaseHTTPRequestHandler
+
+class _Health(BaseHTTPRequestHandler):
+    def do_GET(self):
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(b"OK")
+    def log_message(self, *a): pass
+
+def _start_health_server():
+    port = int(os.environ.get("PORT", 10000))
+    HTTPServer(("0.0.0.0", port), _Health).serve_forever()
+
+# ---------------------------------------------------------------------------
 # Run
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
+    threading.Thread(target=_start_health_server, daemon=True).start()
     bot.run(DISCORD_TOKEN)
